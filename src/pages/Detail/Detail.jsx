@@ -91,6 +91,7 @@ export default function Detail() {
 
   const found = reduxMsg.find((msg) => msg.id === id);
 
+  // FUNCTIONS
   const openModal = () => {
     setModal(true);
   };

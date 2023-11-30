@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { v4 as uuid } from "uuid";
 import { addMsg } from "../../shared/redux/modules/messages";
+import axios from "axios";
 
 const InputContainer = styled.div`
   width: 100%;
@@ -99,25 +100,37 @@ const SubmitBtn = styled.button.attrs((props) => ({
 
 export default function Input() {
   // STATES
-  const [sendTo, setSendTo] = useState("민지");
-  const [name, setName] = useState("");
-  const [message, setMessage] = useState("");
+  const [task, setTask] = useState({
+    id: uuid(),
+    sendTo: "민지",
+    name: "",
+    message: "",
+    createdAt: new Date().getTime(),
+  });
 
-  // HOOKS
-  const dispatch = useDispatch();
+  // Functions
+
+  const postData = async () => {
+    await axios.post("http://localhost:4000/messages", task);
+    try {
+      alert("게시물 등록이 완료되었습니다.");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   // FUNCTIONS
   const handleChange = (e) => {
     const { target } = e;
     switch (target.name) {
       case "sendTo":
-        setSendTo(target.value);
+        setTask({ ...task, sendTo: e.target.value });
         break;
       case "name":
-        setName(target.value);
+        setTask({ ...task, name: e.target.value });
         break;
       case "message":
-        setMessage(target.value);
+        setTask({ ...task, message: e.target.value });
         break;
       default:
         return target.value;
@@ -126,17 +139,15 @@ export default function Input() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const msg = {
+    setTask((prev) => ({
+      ...prev,
       id: uuid(),
-      sendTo,
-      name,
-      message,
+      name: "",
+      sendTo: "민지",
+      message: "",
       createdAt: new Date().getTime(),
-    };
-    dispatch(addMsg(msg));
-    setMessage("");
-    setName("");
-    setSendTo("민지");
+    }));
+    postData();
   };
 
   // Variables
@@ -147,21 +158,24 @@ export default function Input() {
       <InputForm onSubmit={handleSubmit}>
         <TextBox>
           To.
-          <InputSelect onChange={handleChange} name="sendTo" value={sendTo}>
+          <InputSelect
+            onChange={handleChange}
+            name="sendTo"
+            value={task.sendTo}>
             {members.map((member) => {
               return <InputOptions key={member}>{member}</InputOptions>;
             })}
           </InputSelect>
           <InputWrapper>
             Name
-            <InputEl onChange={handleChange} name="name" value={name} />
+            <InputEl onChange={handleChange} name="name" value={task.name} />
           </InputWrapper>
           <InputWrapper>
             Message
             <InputTextArea
               onChange={handleChange}
               name="message"
-              value={message}
+              value={task.message}
             />
           </InputWrapper>
         </TextBox>

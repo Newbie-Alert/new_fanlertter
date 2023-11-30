@@ -1,8 +1,10 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import { FadeAnimation } from "../Banner/styles";
+import axios from "axios";
+import { addMsg } from "../../shared/redux/modules/messages";
 
 const MessageGridContainer = styled.div`
   width: 100%;
@@ -16,6 +18,7 @@ const MessageGridContainer = styled.div`
 
 const MessageBox = styled.div`
   width: 100%;
+  min-width: 150px;
   height: 150px;
   padding: 1rem;
   border: 1px solid black;
@@ -73,8 +76,21 @@ const MessageContent = styled.div`
 `;
 
 export default function MessageGrid({ curMember }) {
-  // Redux States
-  const reduxMsg = useSelector((state) => state.messages);
+  // States
+  const [messages, setMessages] = useState();
+
+  const fetchData = async () => {
+    const res = await axios.get("http://localhost:4000/messages");
+    try {
+      setMessages(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Hooks
   const navi = useNavigate();
@@ -82,8 +98,8 @@ export default function MessageGrid({ curMember }) {
   // Variables
   const filteredData =
     curMember === "전체"
-      ? reduxMsg
-      : reduxMsg?.filter((msg) => msg.sendTo === curMember);
+      ? messages
+      : messages?.filter((msg) => msg.sendTo === curMember);
 
   return (
     <MessageGridContainer>
