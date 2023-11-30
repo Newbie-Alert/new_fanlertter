@@ -1,8 +1,7 @@
 import React from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { removeMsg } from "../../shared/redux/modules/messages";
+import instance from "../../axios/api";
 
 // STYLED COMPONENT
 const ModalBackDrop = styled.div`
@@ -56,9 +55,6 @@ const Button = styled.button`
 
 // MAIN COMPONENT
 export default function Modal({ id, setModal }) {
-  // REDUX_DISPATCH
-  const dispatch = useDispatch();
-
   // HOOKS
   const navi = useNavigate();
 
@@ -68,7 +64,7 @@ export default function Modal({ id, setModal }) {
   };
 
   const deleteMessage = (id) => {
-    dispatch(removeMsg(id));
+    instance.delete(`/messages/${id}`);
     navi("/");
   };
 

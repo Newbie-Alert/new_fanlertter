@@ -20,6 +20,9 @@ const HeaderTitle = styled.h3`
 
 const HeaderBox = styled.div`
   width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;
 
 const HeaderRegisterBtn = styled.button.attrs((props) => ({

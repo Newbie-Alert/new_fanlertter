@@ -4,7 +4,8 @@ import { FadeAnimation } from "../../components/Banner/styles";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../../components/Modal/Modal";
-import { editMsg } from "../../shared/redux/modules/messages";
+import { __getMessages } from "../../shared/redux/modules/messages";
+import instance from "../../axios/api";
 
 const DetailContainer = styled.div`
   width: 100%;
@@ -84,12 +85,14 @@ export default function Detail() {
   const [isEdit, setIsEdit] = useState(false);
   const [newMsg, setNewMsg] = useState("");
 
-  const reduxMsg = useSelector((state) => state.messages);
+  const { messages, isLoading, isError } = useSelector(
+    (state) => state.messages
+  );
   const dispatch = useDispatch();
 
   const { id } = useParams();
 
-  const found = reduxMsg.find((msg) => msg.id === id);
+  const found = messages?.find((msg) => msg.id === id);
 
   // FUNCTIONS
   const openModal = () => {
@@ -105,12 +108,17 @@ export default function Detail() {
   };
 
   const editData = () => {
-    if (newMsg.length === 0) {
+    if (newMsg.length === 0 || newMsg === "") {
       alert("변경 사항이 없습니다");
     } else {
-      dispatch(editMsg({ id, newMsg }));
+      instance.put(`/messages/${id}`, {
+        ...found,
+        message: newMsg,
+      });
       alert("수정이 완료되었습니다");
+      dispatch(__getMessages());
       handleEdit();
+      setNewMsg(found.message);
     }
     setIsEdit(false);
   };

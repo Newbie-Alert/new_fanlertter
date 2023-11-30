@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { v4 as uuid } from "uuid";
-import { addMsg } from "../../shared/redux/modules/messages";
-import axios from "axios";
+import { __getMessages } from "../../shared/redux/modules/messages";
+import instance from "../../axios/api";
 
 const InputContainer = styled.div`
   width: 100%;
   border: 1px solid black;
   padding: 1rem 3rem;
+  position: relative;
 `;
 
 const InputForm = styled.form`
@@ -98,7 +99,30 @@ const SubmitBtn = styled.button.attrs((props) => ({
   }
 `;
 
+const BackDrop = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #ffffff50;
+`;
+
+const BackDropText = styled.h3`
+  width: fit-content;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  font-size: 2rem;
+  font-weight: 500;
+`;
+
 export default function Input() {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+
   // STATES
   const [task, setTask] = useState({
     id: uuid(),
@@ -109,17 +133,16 @@ export default function Input() {
   });
 
   // Functions
-
   const postData = async () => {
-    await axios.post("http://localhost:4000/messages", task);
+    await instance.post("/messages", task);
     try {
       alert("게시물 등록이 완료되었습니다.");
+      dispatch(__getMessages());
     } catch (err) {
       console.log(err);
     }
   };
 
-  // FUNCTIONS
   const handleChange = (e) => {
     const { target } = e;
     switch (target.name) {
@@ -181,6 +204,11 @@ export default function Input() {
         </TextBox>
         <SubmitBtn>메세지 보내기</SubmitBtn>
       </InputForm>
+      {user?.length === 0 && (
+        <BackDrop>
+          <BackDropText>로그인 후 이용 가능합니다.</BackDropText>
+        </BackDrop>
+      )}
     </InputContainer>
   );
 }

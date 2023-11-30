@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import { FadeAnimation } from "../Banner/styles";
-import axios from "axios";
-import { addMsg } from "../../shared/redux/modules/messages";
+import messages, { __getMessages } from "../../shared/redux/modules/messages";
 
 const MessageGridContainer = styled.div`
   width: 100%;
@@ -77,19 +76,13 @@ const MessageContent = styled.div`
 
 export default function MessageGrid({ curMember }) {
   // States
-  const [messages, setMessages] = useState();
-
-  const fetchData = async () => {
-    const res = await axios.get("http://localhost:4000/messages");
-    try {
-      setMessages(res.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const { messages, isLoading, isError } = useSelector(
+    (state) => state.messages
+  );
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchData();
+    dispatch(__getMessages());
   }, []);
 
   // Hooks
