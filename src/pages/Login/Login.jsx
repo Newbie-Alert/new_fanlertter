@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { v4 as uuid } from "uuid";
-import authInstance from "../../axios/authAPI";
-import { useDispatch } from "react-redux";
-import { __setUserData } from "../../shared/redux/modules/auth";
+import { authSignUp } from "../../axios/authAPI";
+import { useDispatch, useSelector } from "react-redux";
+import { __doLogin, __doSignUp } from "../../shared/redux/modules/auth";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 
-const Toast = Swal.mixin({
+export const Toast = Swal.mixin({
   toast: true,
   position: "top-end",
   showConfirmButton: false,
@@ -104,14 +103,19 @@ const LoginButton = styled.button.attrs((props) => ({
 `;
 
 export default function Login() {
+  // STATES
   const [isSignUp, setIsSignUp] = useState(false);
   const [isPassed, setIsPassed] = useState(false);
-
   const [postBody, setPostBody] = useState({
     id: "",
     password: "",
     nickname: "",
   });
+
+  // REDUX STATES
+  const { user, isError, isLoading, error } = useSelector(
+    (state) => state.auth
+  );
 
   // HOOKS
   const dispatch = useDispatch();
@@ -120,10 +124,6 @@ export default function Login() {
   // Functions
   const naviTo = (path) => {
     navi(path);
-  };
-
-  const toggleSignUp = () => {
-    setIsSignUp((prev) => !prev);
   };
 
   const handleChange = (e) => {
@@ -159,26 +159,46 @@ export default function Login() {
     }
   };
 
-  const doSignUp = async () => {
+  const toggleSignUp = () => {
+    setIsSignUp((prev) => !prev);
+  };
+
+  const doSignUp = () => {
     try {
-      await authInstance.post("/register", postBody);
-      alert("가입 완료");
-      setIsSignUp(false);
-      setPostBody((prev) => ({
-        ...prev,
-        id: "",
-        password: "",
-        nickname: "",
-      }));
+      dispatch(__doSignUp(postBody));
+      if (isError === false) {
+        Toast.fire({
+          icon: "success",
+          title: "회원가입 완료",
+        });
+        setIsSignUp(false);
+        setPostBody((prev) => ({
+          ...prev,
+          id: "",
+          password: "",
+          nickname: "",
+        }));
+      }
     } catch (err) {
-      console.log(err.message);
+      Toast.fire({
+        icon: "error",
+        title: error?.message,
+        text: "회원가입 오류",
+      });
     }
   };
 
-  const doLogin = async () => {
-    try {
-      const { id, password } = postBody;
-      dispatch(__setUserData({ id, password }));
+  const doLogin = () => {
+    const { id, password } = postBody;
+    dispatch(__doLogin({ id: id, password: password }));
+
+    if (isError === true) {
+      Toast.fire({
+        icon: "error",
+        title: error.message,
+        text: "로그인 실패",
+      });
+    } else {
       setIsSignUp(false);
       setPostBody((prev) => ({
         ...prev,
@@ -191,8 +211,6 @@ export default function Login() {
         title: "로그인 성공",
       });
       naviTo("/");
-    } catch (err) {
-      console.log(err.message);
     }
   };
 
@@ -226,7 +244,7 @@ export default function Login() {
             onClick={doSignUp}
             onChange={handleChange}
             $isPass={isPassed}
-            $to={"login"}>
+            $to={"signup"}>
             가입하기
           </LoginButton>
         ) : (

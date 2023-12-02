@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { FadeAnimation } from "../../components/Banner/styles";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../../components/Modal/Modal";
 import { __getMessages } from "../../shared/redux/modules/messages";
-import instance from "../../axios/api";
+import messageAPI from "../../axios/messageAPI";
+import { __fetchUserInfo } from "../../shared/redux/modules/auth";
 
 const DetailContainer = styled.div`
   width: 100%;
@@ -85,6 +86,8 @@ export default function Detail() {
   const [isEdit, setIsEdit] = useState(false);
   const [newMsg, setNewMsg] = useState("");
 
+  useEffect(() => {}, []);
+
   const { messages, isLoading, isError } = useSelector(
     (state) => state.messages
   );
@@ -100,6 +103,7 @@ export default function Detail() {
   };
 
   const handleEdit = () => {
+    dispatch(__fetchUserInfo());
     setIsEdit((prev) => !prev);
   };
 
@@ -111,7 +115,7 @@ export default function Detail() {
     if (newMsg.length === 0 || newMsg === "") {
       alert("변경 사항이 없습니다");
     } else {
-      instance.put(`/messages/${id}`, {
+      messageAPI.put(`/messages/${id}`, {
         ...found,
         message: newMsg,
       });
@@ -127,37 +131,40 @@ export default function Detail() {
     <>
       <DetailContainer>
         <DetailBox>
-          <DetailTitle>To. {found.sendTo}</DetailTitle>
-          <DetailTime>From. {found.name}</DetailTime>
+          <DetailTitle>To. {found?.sendTo}</DetailTitle>
+          <DetailTime>From. {found?.name}</DetailTime>
           {isEdit ? (
             <DetailContent>
               <EditArea
                 onChange={handleChange}
                 value={newMsg}
-                $curMsg={found.message}></EditArea>
+                $curMsg={found?.message}></EditArea>
             </DetailContent>
           ) : (
-            <DetailContent>{found.message}</DetailContent>
+            <DetailContent>{found?.message}</DetailContent>
           )}
-          <DetailButtonBox>
-            {isEdit ? (
-              <DetailButtons $role={"edit"} onClick={(e) => editData(e)}>
-                수정하기
-              </DetailButtons>
-            ) : (
-              <DetailButtons $role={"delete"} onClick={openModal}>
-                삭제
-              </DetailButtons>
-            )}
-            {isEdit ? (
-              <DetailButtons onClick={handleEdit}>취소</DetailButtons>
-            ) : (
-              <DetailButtons onClick={handleEdit}>수정</DetailButtons>
-            )}
-          </DetailButtonBox>
+          {found.uid !==
+          JSON.parse(localStorage.getItem("user"))?.userId ? null : (
+            <DetailButtonBox>
+              {isEdit ? (
+                <DetailButtons $role={"edit"} onClick={(e) => editData(e)}>
+                  수정하기
+                </DetailButtons>
+              ) : (
+                <DetailButtons $role={"delete"} onClick={openModal}>
+                  삭제
+                </DetailButtons>
+              )}
+              {isEdit ? (
+                <DetailButtons onClick={handleEdit}>취소</DetailButtons>
+              ) : (
+                <DetailButtons onClick={handleEdit}>수정</DetailButtons>
+              )}
+            </DetailButtonBox>
+          )}
         </DetailBox>
       </DetailContainer>
-      {modal ? <Modal setModal={setModal} id={id} /> : null}
+      {modal ? <Modal setModal={setModal} found={found} /> : null}
     </>
   );
 }

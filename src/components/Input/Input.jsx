@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { v4 as uuid } from "uuid";
 import { __getMessages } from "../../shared/redux/modules/messages";
-import instance from "../../axios/api";
+import messageAPI from "../../axios/messageAPI";
 
 const InputContainer = styled.div`
   width: 100%;
@@ -52,8 +52,7 @@ const TextBox = styled.div`
 `;
 
 const InputEl = styled.input.attrs((props) => ({
-  // 유저 정보가 오면 그 닉네임을 담도록 하자.
-  // placeholder:'이름을 입력하세요'
+  readOnly: props.$nickname === "nickname" && true,
   required: true,
 }))`
   width: 160px;
@@ -121,20 +120,31 @@ const BackDropText = styled.h3`
 
 export default function Input() {
   const dispatch = useDispatch();
+  const [isLogined, setIsLogined] = useState(null);
   const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    setIsLogined(JSON.parse(localStorage.getItem("user")));
+    setTask({
+      ...task,
+      name: JSON.parse(localStorage.getItem("user"))?.nickname,
+      uid: JSON.parse(localStorage.getItem("user"))?.userId,
+    });
+  }, [user]);
 
   // STATES
   const [task, setTask] = useState({
     id: uuid(),
     sendTo: "민지",
-    name: "",
+    name: isLogined?.nickname,
     message: "",
     createdAt: new Date().getTime(),
+    uid: "",
   });
 
   // Functions
   const postData = async () => {
-    await instance.post("/messages", task);
+    await messageAPI.post("/messages", task);
     try {
       alert("게시물 등록이 완료되었습니다.");
       dispatch(__getMessages());
@@ -147,13 +157,10 @@ export default function Input() {
     const { target } = e;
     switch (target.name) {
       case "sendTo":
-        setTask({ ...task, sendTo: e.target.value });
-        break;
-      case "name":
-        setTask({ ...task, name: e.target.value });
+        setTask({ ...task, sendTo: target.value });
         break;
       case "message":
-        setTask({ ...task, message: e.target.value });
+        setTask({ ...task, message: target.value });
         break;
       default:
         return target.value;
@@ -165,7 +172,7 @@ export default function Input() {
     setTask((prev) => ({
       ...prev,
       id: uuid(),
-      name: "",
+      name: isLogined?.nickname,
       sendTo: "민지",
       message: "",
       createdAt: new Date().getTime(),
@@ -191,7 +198,12 @@ export default function Input() {
           </InputSelect>
           <InputWrapper>
             Name
-            <InputEl onChange={handleChange} name="name" value={task.name} />
+            <InputEl
+              onChange={handleChange}
+              name="name"
+              $nickname={"nickname"}
+              value={isLogined?.nickname}
+            />
           </InputWrapper>
           <InputWrapper>
             Message
@@ -204,7 +216,7 @@ export default function Input() {
         </TextBox>
         <SubmitBtn>메세지 보내기</SubmitBtn>
       </InputForm>
-      {user?.length === 0 && (
+      {isLogined === null && (
         <BackDrop>
           <BackDropText>로그인 후 이용 가능합니다.</BackDropText>
         </BackDrop>

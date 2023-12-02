@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import MessageGrid from "../MessageGrid/MessageGrid";
+import { useSelector } from "react-redux";
 
 const MessageContainer = styled.div`
   width: 100%;
@@ -57,15 +58,40 @@ const MessageFilterBtn = styled.div`
   }
 `;
 
+const NotLogined = styled.div`
+  width: 100%;
+  padding: 2rem 1rem 2rem 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+`;
+
 export default function Message() {
   const members = ["전체", "민지", "혜인", "하니", "다니엘", "혜린"];
 
   const [curMember, setCurMemeber] = useState("전체");
+  const [isLogined, setIsLogined] = useState(false);
+
+  const { user, isLoding, isError, error } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (localStorage.getItem("user") !== null) {
+      setIsLogined(true);
+    } else {
+      setIsLogined(false);
+    }
+  }, [user]);
 
   const handleCurMember = (e) => {
     setCurMemeber(e.target.innerText);
   };
 
+  if (isLogined === false) {
+    return (
+      <NotLogined>
+        <h1>로그인 후 메세지를 보세요!</h1>
+      </NotLogined>
+    );
+  }
   return (
     <MessageContainer>
       <MessageHeader>

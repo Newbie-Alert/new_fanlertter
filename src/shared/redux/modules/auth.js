@@ -1,34 +1,68 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import authInstance from '../../../axios/authAPI'
+import { authEdit, authInfo, authLogin, authSignUp } from '../../../axios/authAPI'
 
 const initialState = {
-  user: [],
+  user: null,
   isLoading: false,
   isError: false,
-  error: null
+  error: null,
+  avatar: '',
+  info: null,
 }
 
-export const __fetchData = createAsyncThunk(
-  "FETCH_DATA",
+// ASYNC ACTION CREATOR -----------> EXTRA REDUCER
+
+// SignUp
+export const __doSignUp = createAsyncThunk(
+  "SIGN_UP",
   async (payload, thunkAPI) => {
     try {
-      const userData = await authInstance.get('/user', {
-        "headers": {
-          'Authorization': `Bearer ${payload}`
-        }
-      })
-      return thunkAPI.fulfillWithValue(userData.data)
-    } catch (err) {
-      console.log(err);
+      console.log(payload);
+      const res = await authSignUp.post('', payload);
+      return thunkAPI.fulfillWithValue(res.data);
+    }
+    catch (err) {
+      return thunkAPI.rejectWithValue(err);
     }
   }
 )
 
-export const __setUserData = createAsyncThunk(
-  "SET_USER_DATA",
+// LOGIN
+export const __doLogin = createAsyncThunk(
+  "LOGIN",
   async (payload, thunkAPI) => {
     try {
-      const res = await authInstance.post('/login?expiresIn=1m', payload);
+      const res = await authLogin.post('', payload);
+      return thunkAPI.fulfillWithValue(res.data);
+    }
+    catch (err) {
+      return thunkAPI.rejectWithValue(err);
+    }
+  }
+)
+
+// FETCH_USER_INFO
+export const __fetchUserInfo = createAsyncThunk(
+  "FETCH_USER_INFO",
+  async (payload, thunkAPI) => {
+    try {
+      const res = await authInfo.get()
+      return thunkAPI.fulfillWithValue(res.data)
+    }
+
+    catch (err) {
+      return thunkAPI.rejectWithValue(err)
+    }
+  }
+)
+
+// EDIT_USER_DATA
+export const __editUserData = createAsyncThunk(
+  "EDIT_USER_DATA",
+  async (payload, thunkAPI) => {
+    try {
+      const res = await authEdit.patch('', payload);
+
       return thunkAPI.fulfillWithValue(res.data);
     }
     catch (err) {
@@ -42,41 +76,81 @@ const authSlice = createSlice({
   name: 'authSlice',
   initialState,
   reducers: {
-
+    removeUser: (state, action) => {
+      return { ...state, user: null }
+    }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(__setUserData.pending, (state) => {
+      // SIGN UP
+      .addCase(__doSignUp.pending, (state) => {
         state.isLoading = true;
       })
 
-      .addCase(__setUserData.fulfilled, (state, action) => {
-        state.user = action.payload;
+      .addCase(__doSignUp.fulfilled, (state) => {
         state.isLoading = false;
+        state.user = null;
+        state.isError = false;
+      })
+
+      .addCase(__doSignUp.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.error = action.payload;
+      })
+
+      // LOGIN
+      .addCase(__doLogin.pending, (state) => {
+        state.isLoading = true;
+      })
+
+      .addCase(__doLogin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
         state.isError = false;
         localStorage.setItem('user', JSON.stringify(action.payload))
       })
 
-      .addCase(__setUserData.rejected, (state, action) => {
-        state.isError = true;
+      .addCase(__doLogin.rejected, (state, action) => {
         state.isLoading = false;
+        state.isError = true;
         state.error = action.error;
       })
-      .addCase(__fetchData.pending, (state) => {
+
+      // user INFO
+      .addCase(__fetchUserInfo.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(__fetchData.fulfilled, (state, action) => {
+      .addCase(__fetchUserInfo.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isLoading = false;
         state.isError = false;
+        localStorage.setItem('info', JSON.stringify(action.payload))
       })
-      .addCase(__fetchData.rejected, (state, action) => {
+      .addCase(__fetchUserInfo.rejected, (state, action) => {
         state.isError = true;
         state.isLoading = false;
-        state.error = action.error;
+        state.error = action.payload;
+      })
+
+      // EDIT
+      .addCase(__editUserData.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(__editUserData.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.info = action.payload;
+        state.isLoading = false;
+        state.isError = false;
+      })
+      .addCase(__editUserData.rejected, (state, action) => {
+        state.isError = true;
+        state.isLoading = false;
+        state.error = action.payload;
       })
   }
 })
 
 
 export default authSlice.reducer
+export const { removeUser } = authSlice.actions

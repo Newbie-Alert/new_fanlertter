@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import { FadeAnimation } from "../Banner/styles";
-import messages, { __getMessages } from "../../shared/redux/modules/messages";
+import { __getMessages } from "../../shared/redux/modules/messages";
 
 const MessageGridContainer = styled.div`
   width: 100%;

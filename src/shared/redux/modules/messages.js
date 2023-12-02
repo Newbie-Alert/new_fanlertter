@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import messageAPI from "../../../axios/messageAPI";
 
 const initialState = {
   messages: [],
@@ -19,7 +19,7 @@ export const __getMessages = createAsyncThunk(
   // 서버의 상태에 따라 작동
   async (payload, thunkAPI) => {
     try {
-      const res = await axios.get('http://localhost:4000/messages');
+      const res = await messageAPI.get('/messages');
       // 네트워크 요청이 성공 시
       return thunkAPI.fulfillWithValue(res.data);
     }

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import instance from "../../axios/api";
+import messageAPI from "../../axios/messageAPI";
+import { useDispatch } from "react-redux";
+import { __fetchUserInfo } from "../../shared/redux/modules/auth";
 
 // STYLED COMPONENT
 const ModalBackDrop = styled.div`
@@ -54,17 +56,23 @@ const Button = styled.button`
 `;
 
 // MAIN COMPONENT
-export default function Modal({ id, setModal }) {
+export default function Modal({ id, setModal, found }) {
   // HOOKS
   const navi = useNavigate();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    dispatch(__fetchUserInfo(user?.accessToken));
+  }, []);
 
   // FUNCTIONS
   const closeModal = () => {
     setModal(false);
   };
 
-  const deleteMessage = (id) => {
-    instance.delete(`/messages/${id}`);
+  const deleteMessage = () => {
+    messageAPI.delete(`/messages/${found.id}`);
     navi("/");
   };
 
@@ -75,7 +83,7 @@ export default function Modal({ id, setModal }) {
         <h4>메세지를 삭제하시겠습니까?</h4>
         <ConfirmButtonBox>
           <Button
-            id={id}
+            id={found.id}
             onClick={(e) => {
               deleteMessage(e.target.id);
             }}
