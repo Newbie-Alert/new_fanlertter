@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import * as St from "./styles.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
   __fetchUserInfo,
   removeUser,
 } from "../../shared/redux/modules/auth.js";
 import { Toast } from "../../pages/Login/Login.jsx";
+import * as St from "./styles.js";
 
 export default function Header() {
   const navi = useNavigate();
   const [isLogined, setIsLogined] = useState(false);
-  const { user, isLoading, isError, error } = useSelector(
+  const { user, isLoading, isError, error, time } = useSelector(
     (state) => state.auth
   );
   const dispatch = useDispatch();
@@ -21,7 +21,7 @@ export default function Header() {
     if (user !== null) {
       dispatch(__fetchUserInfo());
     }
-  }, [isLogined, user]);
+  }, [isLogined, user, time]);
 
   const naviTo = (path) => {
     navi(path);

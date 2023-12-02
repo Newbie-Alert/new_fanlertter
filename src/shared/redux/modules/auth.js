@@ -8,6 +8,7 @@ const initialState = {
   error: null,
   avatar: '',
   info: null,
+  tokenTime: 10,
 }
 
 // ASYNC ACTION CREATOR -----------> EXTRA REDUCER
@@ -78,7 +79,7 @@ const authSlice = createSlice({
   reducers: {
     removeUser: (state, action) => {
       return { ...state, user: null }
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -153,4 +154,4 @@ const authSlice = createSlice({
 
 
 export default authSlice.reducer
-export const { removeUser } = authSlice.actions
+export const { removeUser, timer } = authSlice.actions

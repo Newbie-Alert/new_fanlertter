@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { authSignUp } from "../../axios/authAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { __doLogin, __doSignUp } from "../../shared/redux/modules/auth";
 import { useNavigate } from "react-router";
@@ -141,6 +140,13 @@ export default function Login() {
     if (id.length === 0 || password.length === 0 || nickname.length === 0) {
       setIsPassed(false);
     }
+    if (isSignUp === false) {
+      if (id.length > 4 && id.length <= 10) {
+        if (password.length > 4 && password.length <= 10) {
+          setIsPassed(true);
+        }
+      }
+    }
 
     // set Input by name
     const { target } = e;
@@ -209,8 +215,10 @@ export default function Login() {
       Toast.fire({
         icon: "success",
         title: "로그인 성공",
+        timer: 1500,
+      }).then((value) => {
+        value.isDismissed && naviTo("/");
       });
-      naviTo("/");
     }
   };
 
@@ -251,7 +259,7 @@ export default function Login() {
           <LoginButton
             onClick={doLogin}
             onChange={handleChange}
-            $isPass={true}
+            $isPass={isPassed}
             $to={"login"}>
             로그인
           </LoginButton>

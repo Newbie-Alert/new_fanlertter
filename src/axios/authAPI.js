@@ -9,7 +9,7 @@ const authSignUp = axios.create({
 
 // login
 const authLogin = axios.create({
-  baseURL: BASE_URL + '/login?expiresIn=10m',
+  baseURL: BASE_URL + '/login?expiresIn=1m',
 })
 
 // userData
