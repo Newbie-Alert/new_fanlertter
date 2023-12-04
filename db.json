@@ -1,0 +1,51 @@
+{
+  "messages": [
+    {
+      "id": "8fd32125-99aa-4cb6-9126-bc613952db74",
+      "sendTo": "민지",
+      "name": "ㅁㄴㅇ",
+      "message": "123",
+      "createdAt": 1701339833189
+    },
+    {
+      "id": "f2c8365c-1746-45c8-8277-4b8ba2671ba7",
+      "sendTo": "민지",
+      "name": "와플곰2",
+      "message": "asdf123",
+      "createdAt": 1701399838591,
+      "uid": "test7"
+    },
+    {
+      "id": "483605fe-ae12-4fd1-9d1c-b6678d57c78d",
+      "sendTo": "민지",
+      "name": "와플곰3",
+      "message": "asdgwg",
+      "createdAt": 1701400643420,
+      "uid": "test6"
+    },
+    {
+      "id": "48532853-389f-4038-81cb-8c7650a1f3a7",
+      "sendTo": "민지",
+      "name": "waffle3",
+      "message": "125asdg",
+      "createdAt": 1701459086832,
+      "uid": "waffle3"
+    },
+    {
+      "id": "bb20a7e8-b9a3-4e8f-84e8-4ea5889f2729",
+      "sendTo": "하니",
+      "name": "waffleBear",
+      "message": "안냥하세요 와플곰입니다",
+      "createdAt": 1701493290044,
+      "uid": "waffleB"
+    },
+    {
+      "id": "a4b0bfdf-2738-48bf-8387-54cf78e13aa9",
+      "sendTo": "민지",
+      "name": "waffleBear",
+      "message": "213",
+      "createdAt": 1701650068559,
+      "uid": "waffle7"
+    }
+  ]
+}

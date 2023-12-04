@@ -1,85 +1,11 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { FadeAnimation } from "../../components/Banner/styles";
+import * as St from "./styles";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../../components/Modal/Modal";
 import { __getMessages } from "../../shared/redux/modules/messages";
 import messageAPI from "../../axios/messageAPI";
 import { __fetchUserInfo } from "../../shared/redux/modules/auth";
-
-const DetailContainer = styled.div`
-  width: 100%;
-  padding-top: 4.1rem;
-  animation: ${FadeAnimation} 0.4s forwards;
-`;
-
-const DetailBox = styled.div`
-  width: 100%;
-  border-radius: 6px;
-  max-width: 800px;
-  margin: auto;
-  margin-top: 5rem;
-  border: 1px solid black;
-  font-weight: 600;
-`;
-
-const DetailTitle = styled.div`
-  width: 100%;
-  padding: 1rem;
-  border-bottom: 1px solid #1d1d1d;
-`;
-
-const DetailTime = styled.div`
-  width: 100%;
-  padding: 1rem;
-  border-bottom: 1px solid #1d1d1d;
-`;
-
-const DetailContent = styled.div`
-  width: 100%;
-  padding: 1rem;
-  height: 300px;
-  font-weight: 500;
-`;
-
-const DetailButtonBox = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1rem;
-  padding: 1rem;
-  border-top: 1px solid #1d1d1d;
-`;
-
-const DetailButtons = styled.button.attrs((props) => ({
-  type: "button",
-}))`
-  width: 120px;
-  padding: 0.5rem;
-  cursor: pointer;
-  font-weight: 600;
-  border: none;
-  font-size: 0.9rem;
-  border-radius: 6px;
-
-  &:hover {
-    background-color: ${(props) =>
-      props.$role === "delete" ? "#fa334d" : "#528eff"};
-    color: white;
-  }
-`;
-
-const EditArea = styled.textarea.attrs((props) => ({
-  placeholder: `${props.$curMsg}`,
-}))`
-  width: 100%;
-  height: 100%;
-  padding: 0.5rem;
-  font-size: 0.9rem;
-  color: black;
-  background-color: #eee;
-`;
 
 export default function Detail() {
   const [modal, setModal] = useState(false);
@@ -88,9 +14,7 @@ export default function Detail() {
 
   useEffect(() => {}, []);
 
-  const { messages, isLoading, isError } = useSelector(
-    (state) => state.messages
-  );
+  const { messages } = useSelector((state) => state.messages);
   const dispatch = useDispatch();
 
   const { id } = useParams();
@@ -129,41 +53,41 @@ export default function Detail() {
 
   return (
     <>
-      <DetailContainer>
-        <DetailBox>
-          <DetailTitle>To. {found?.sendTo}</DetailTitle>
-          <DetailTime>From. {found?.name}</DetailTime>
+      <St.DetailContainer>
+        <St.DetailBox>
+          <St.DetailTitle>To. {found?.sendTo}</St.DetailTitle>
+          <St.DetailTime>From. {found?.name}</St.DetailTime>
           {isEdit ? (
-            <DetailContent>
-              <EditArea
+            <St.DetailContent>
+              <St.EditArea
                 onChange={handleChange}
                 value={newMsg}
-                $curMsg={found?.message}></EditArea>
-            </DetailContent>
+                $curMsg={found?.message}></St.EditArea>
+            </St.DetailContent>
           ) : (
-            <DetailContent>{found?.message}</DetailContent>
+            <St.DetailContent>{found?.message}</St.DetailContent>
           )}
           {found.uid !==
           JSON.parse(localStorage.getItem("user"))?.userId ? null : (
-            <DetailButtonBox>
+            <St.DetailButtonBox>
               {isEdit ? (
-                <DetailButtons $role={"edit"} onClick={(e) => editData(e)}>
+                <St.DetailButtons $role={"edit"} onClick={(e) => editData(e)}>
                   수정하기
-                </DetailButtons>
+                </St.DetailButtons>
               ) : (
-                <DetailButtons $role={"delete"} onClick={openModal}>
+                <St.DetailButtons $role={"delete"} onClick={openModal}>
                   삭제
-                </DetailButtons>
+                </St.DetailButtons>
               )}
               {isEdit ? (
-                <DetailButtons onClick={handleEdit}>취소</DetailButtons>
+                <St.DetailButtons onClick={handleEdit}>취소</St.DetailButtons>
               ) : (
-                <DetailButtons onClick={handleEdit}>수정</DetailButtons>
+                <St.DetailButtons onClick={handleEdit}>수정</St.DetailButtons>
               )}
-            </DetailButtonBox>
+            </St.DetailButtonBox>
           )}
-        </DetailBox>
-      </DetailContainer>
+        </St.DetailBox>
+      </St.DetailContainer>
       {modal ? <Modal setModal={setModal} found={found} /> : null}
     </>
   );
