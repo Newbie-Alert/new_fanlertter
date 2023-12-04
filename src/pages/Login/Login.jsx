@@ -43,10 +43,8 @@ export default function Login() {
       setIsPassed(false);
     }
     if (isSignUp === false) {
-      if (id.length > 4 && id.length <= 10) {
-        if (password.length > 4 && password.length <= 10) {
-          setIsPassed(true);
-        }
+      if (Boolean(postBody.id) && Boolean(postBody.password)) {
+        setIsPassed(true);
       }
     }
 
